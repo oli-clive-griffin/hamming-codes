@@ -3,10 +3,8 @@ import operator as op
 from math import log2
 from functools import reduce
 from random import randrange
+from sys import argv
 
-
-
-DIMENSION = 64
 
 class bcolors:
     HEADER = '\033[95m'
@@ -34,7 +32,7 @@ def prepare_bits(bits):
     parity_position = xor(bits)
     
     #4 hard coded for now
-    for i in reversed([2**i for i in range(int(log2(DIMENSION)))]):
+    for i in reversed([2**x for x in range(int(log2(DIMENSION)))]):
         if parity_position >= i:
             bits[i] = not bits[i]
             parity_position = parity_position - i   
@@ -79,28 +77,36 @@ def print_bits(bits, flat=False):
 
 
 if __name__ == '__main__':
+
+    if len(argv) > 1:
+        DIMENSION = int(argv[1])
+    else:
+        DIMENSION = 64
+
     bits = generate_bits()
-    print(f"\ninitial bits:")
+    print("\n")
+    print(f"{bcolors.OKCYAN}Initial bits: {bcolors.ENDC}")
     print_bits(bits)
 
-
     bits = prepare_bits(bits)
-    print("prepared bits:")
+    INITIAL_BITS = bits 
+    print(f"{bcolors.OKCYAN}Prepared bits: {bcolors.ENDC}")
     print_bits(bits)
 
     if not check_properly_prepared(bits):
-        raise NameError("preparing failed")
+        raise NameError("Preparing failed")
     
     bit_flipped, bits = random_bit_flip(bits)
-    print(f"bit flipped: {bit_flipped}")
+    print(f"{bcolors.OKCYAN}Bit flipped: {bit_flipped}{bcolors.ENDC}")
     print_bits(bits)
     
     bits = repair_bits(bits)
-    print(f"repaired bits:")
+    print(f"{bcolors.OKCYAN}Repaired bits: {bcolors.ENDC}")
     print_bits(bits)
-
-    print(bcolors.WARNING + "Warning: No active frommets remain. Continue?" + bcolors.ENDC)
-
     
 
+    if (np.allclose(bits, INITIAL_BITS)):
+        print(bcolors.OKGREEN + "Message successfully repaired" + bcolors.ENDC)
+    else:
+        print(bcolors.RED + "Message could not be repaired" + bcolors.ENDC)
 
